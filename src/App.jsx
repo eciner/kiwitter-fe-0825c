@@ -4,6 +4,8 @@ import PageLayout from "./PageLayout";
 import Login from "./Login";
 import Signup from "./Signup";
 
+import "./utils/devserver.js";
+
 function App() {
   return (
     <div>
