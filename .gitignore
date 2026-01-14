@@ -13,6 +13,8 @@ dist-ssr
 *.local
 
 guides
+references
+lecturer-completed
 
 # Editor directories and files
 .vscode/*

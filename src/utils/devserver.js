@@ -1,6 +1,24 @@
 import { createServer, Response } from "miragejs"
 import { jwtDecode } from "jwt-decode";
 
+function decodeToken(token) {
+    try {
+        // Remove 'Bearer ' prefix if present
+        const cleanToken = token.replace('Bearer ', '');
+        
+        // Try to decode as JWT first
+        try {
+            return jwtDecode(cleanToken);
+        } catch {
+            // If JWT decode fails, try base64 decode (for demo tokens)
+            return JSON.parse(atob(cleanToken));
+        }
+    } catch (error) {
+        console.error('Token decode error:', error);
+        return null;
+    }
+}
+
 function generateRandomDate() {
     const start = new Date(2025, 0, 1); // Start date: Jan 1, 2025
     const end = new Date(); // End date: current date
@@ -8,19 +26,21 @@ function generateRandomDate() {
     return randomDate.getTime()
 }
 
+const authors = [
+    { id: 1, name: "Ahmet Yılmaz", username: "chaotic_orange" },
+    { id: 2, name: "Ayşe Demir", username: "sunny_rose" },
+    { id: 3, name: "Murat Kaya", username: "blue_hawk" },
+    { id: 4, name: "Fatma Aslan", username: "wild_berry" },
+    { id: 5, name: "Mehmet Can", username: "quiet_storm" },
+    { id: 6, name: "Elif Yılmaz", username: "soft_moon" },
+    { id: 7, name: "Kemal Erdem", username: "green_earth" },
+    { id: 8, name: "Zeynep Şahin", username: "silver_wings" },
+    { id: 9, name: "Ali Vural", username: "golden_dream" },
+    { id: 10, name: "Selin Güler", username: "silent_waves" }
+];
+
 function generateRandomAuthors() {
-    const authors = [
-        { id: 1, name: "Ahmet Yılmaz", username: "chaotic_orange" },
-        { id: 2, name: "Ayşe Demir", username: "sunny_rose" },
-        { id: 3, name: "Murat Kaya", username: "blue_hawk" },
-        { id: 4, name: "Fatma Aslan", username: "wild_berry" },
-        { id: 5, name: "Mehmet Can", username: "quiet_storm" },
-        { id: 6, name: "Elif Yılmaz", username: "soft_moon" },
-        { id: 7, name: "Kemal Erdem", username: "green_earth" },
-        { id: 8, name: "Zeynep Şahin", username: "silver_wings" },
-        { id: 9, name: "Ali Vural", username: "golden_dream" },
-        { id: 10, name: "Selin Güler", username: "silent_waves" }
-    ];
+
     return authors[Math.floor(Math.random() * authors.length)];
 }
 
@@ -40,7 +60,7 @@ function generateRandomContent() {
     return contents[Math.floor(Math.random() * contents.length)];
 }
 
-function generateObjects(n) {
+function generateObjects(n, fillReplies = false) {
     const objects = [];
     for (let i = 0; i < n; i++) {
         const author = generateRandomAuthors();
@@ -52,7 +72,7 @@ function generateObjects(n) {
             "content": generateRandomContent(),
             "createDate": generateRandomDate(),
             "likes": like,
-            "replies": Math.floor(Math.random() * 20),
+            "replies": fillReplies ? generateObjects(3, false) : [],
             "name": author.name,
             "username": author.username
         });
@@ -61,12 +81,12 @@ function generateObjects(n) {
     return objects;
 }
 
-const twitsLikedByUser = {
+const tweetsLikedByUser = {
 
 }
 
-const twits = [
-    ...generateObjects(100)
+const tweets = [
+    ...generateObjects(100, true)
 ];
 
 createServer({
@@ -77,117 +97,265 @@ createServer({
 
         this.post("/login", (schema, request) => {
 
-            const { nickname } = JSON.parse(request.requestBody);
+            const { nickname, password } = JSON.parse(request.requestBody);
+            
+            console.log('Login attempt:', { nickname, password });
+            console.log('Available users:', authors.map(a => a.username));
 
+            // Find author by username
+            const author = authors.find(a => a.username === nickname);
+            
+            if (!author) {
+                console.log('User not found:', nickname);
+                return new Response(401, {}, { message: "Kullanıcı adı veya şifre hatalı" });
+            }
+
+            // Create a JWT token with the user's actual data
+            // Note: In a real app, this should be done on the backend
+            const tokenPayload = {
+                sub: author.id,
+                name: author.name,
+                nickname: author.username,
+                iat: Math.floor(Date.now() / 1000)
+            };
+
+            // Create a JWT-like token (header.payload.signature format)
+            // For demo purposes, we'll create a structure that jwtDecode can parse
+            const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+            const payload = btoa(JSON.stringify(tokenPayload));
+            const signature = btoa("mock-signature");
+            const token = `${header}.${payload}.${signature}`;
+
+            console.log('Login successful for:', nickname);
+            console.log('Token created:', token);
+            
             return {
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAwIiwibmFtZSI6IkRlbml6IEFjYXkiLCJuaWNrbmFtZSI6ImRhY2F5IiwiaWF0IjoxNTE2MjM5MDIyfQ.PIHhOqu6GNcStitQ70xfKU9ffDUtjj7Blkhu8RjfUzw",
+                token: token,
                 username: nickname,
             }
-            // return new Response(401);
         });
 
-        this.post("/signup", () => {
-
-            return {};
+        this.post("/signup", (schema, request) => {
+            const { name, nickname, email, password } = JSON.parse(request.requestBody);
+            
+            console.log('Signup attempt:', { name, nickname, email });
+            console.log('Authors before signup:', authors.map(a => a.username));
+            
+            // Check if user already exists
+            const existingUser = authors.find(a => a.username === nickname);
+            if (existingUser) {
+                console.log('User already exists:', nickname);
+                return new Response(400, {}, { message: "Bu kullanıcı adı zaten kullanılıyor" });
+            }
+            
+            // Create new user and add to authors array
+            const newUser = {
+                id: Math.floor(Math.random() * 10000) + 100,
+                name: name,
+                username: nickname,
+                email: email,
+                password: password
+            };
+            
+            authors.push(newUser);
+            
+            console.log('New user added:', newUser.username);
+            console.log('Authors after signup:', authors.map(a => a.username));
+            
+            return {
+                message: "Kayıt başarılı",
+                user: {
+                    id: newUser.id,
+                    name: newUser.name,
+                    username: newUser.username
+                }
+            };
         })
 
-        this.get("/twits", (schema, request) => {
+        this.get("/tweets", (schema, request) => {
 
             const token = request.requestHeaders['Authorization'];
 
             if (token) {
 
-                const decoded = jwtDecode(token);
+                const decoded = decodeToken(token);
                 const { sub: userId } = decoded;
 
                 return {
-                    twits: twits.map(twit => ({
-                        ...twit,
-                        likedByUser: twitsLikedByUser[userId] && twitsLikedByUser[userId].includes(twit.id) ? true : false
+                    tweets: tweets.map(tweet => ({
+                        ...tweet,
+                        likedByUser: tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
                     }))
                 }
             } else {
 
                 return {
-                    twits
+                    tweets
                 }
             }
         })
 
-        this.post("/twits", (schema, request) => {
+        this.post("/tweets", (schema, request) => {
 
             const { content } = JSON.parse(request.requestBody);
             const token = request.requestHeaders['Authorization'];
 
-            const decoded = jwtDecode(token);
-            const { sub: userId } = decoded;
+            const decoded = decodeToken(token);
 
-            const newTwit = {
+            const newTweet = {
                 "id": window.crypto.randomUUID(),
                 "authorId": 1000,
                 "retweets": 0,
                 "content": content,
                 "createDate": Date.now(),
                 "likes": 0,
-                "replies": 0,
+                "replies": [],
                 "name": decoded.name,
                 "username": decoded.nickname,
             }
 
-            twits.push(newTwit);
+            tweets.push(newTweet);
 
             return {
-                twit: newTwit
+                tweet: newTweet
             }
         });
 
-        this.post("/twits/:twitId/like", (schema, request) => {
-
-            const { twitId } = request.params;
+        this.get("/tweets/:tweetId", (schema, request) => {
+            const { tweetId } = request.params;
             const token = request.requestHeaders['Authorization'];
 
-            const { sub: userId } = jwtDecode(token);
+            const tweet = tweets.find(tweet => tweet.id === tweetId);
 
-            const twit = twits.find(twit => twit.id === twitId);
+            if (!tweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
+            }
 
-            if (twitsLikedByUser[userId]) {
+            if (token) {
+                const decoded = decodeToken(token);
+                const userId = decoded?.sub;
+                return {
+                    ...tweet,
+                    likedByUser: userId && tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
+                };
+            }
 
-                twitsLikedByUser[userId].push(twitId);
+            return tweet;
+        });
+
+        this.post("/tweets/:tweetId/replies", (schema, request) => {
+            const { tweetId } = request.params;
+            const token = request.requestHeaders['Authorization'];
+            const { content } = JSON.parse(request.requestBody);
+
+            const decoded = decodeToken(token);
+            const { sub: authorId, name, nickname: username } = decoded;
+
+            const parentTweet = tweets.find(tweet => tweet.id === tweetId);
+
+            if (!parentTweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
+            }
+
+            const newReply = {
+                "id": Math.random().toString(36).substring(2, 15),
+                "content": content,
+                "name": name,
+                "username": username,
+                "authorId": authorId,
+                "createDate": Date.now(),
+                "likes": 0,
+                "retweets": 0,
+                "likedByUser": false,
+                "replies": []
+            };
+
+            parentTweet.replies.push(newReply);
+
+            return {
+                reply: newReply
+            };
+        });
+
+        this.post("/tweets/:tweetId/like", (schema, request) => {
+
+            const { tweetId } = request.params;
+            const token = request.requestHeaders['Authorization'];
+
+            const decoded = decodeToken(token);
+            const { sub: userId } = decoded;
+
+            const tweet = tweets.find(tweet => tweet.id === tweetId);
+
+            if (tweetsLikedByUser[userId]) {
+
+                tweetsLikedByUser[userId].push(tweetId);
 
             } else {
 
-                twitsLikedByUser[userId] = [twitId];
+                tweetsLikedByUser[userId] = [tweetId];
             }
 
-            twit.likes++;
+            tweet.likes++;
 
             return {
-                count: twit.likes
+                count: tweet.likes
             }
         });
 
-        this.delete("/twits/:twitId/like", (schema, request) => {
+        this.delete("/tweets/:tweetId/like", (schema, request) => {
 
-            const { twitId } = request.params;
+            const { tweetId } = request.params;
             const token = request.requestHeaders['Authorization'];
 
-            const { sub: userId } = jwtDecode(token);
+            const decoded = decodeToken(token);
+            const { sub: userId } = decoded;
 
-            const twit = twits.find(twit => twit.id === twitId);
+            const tweet = tweets.find(tweet => tweet.id === tweetId);
 
-            if (!twitsLikedByUser[userId]) {
+            if (!tweetsLikedByUser[userId]) {
 
                 return new Response(200);
             }
 
-            twitsLikedByUser[userId] = twitsLikedByUser[userId].filter(id => id !== twitId);
+            tweetsLikedByUser[userId] = tweetsLikedByUser[userId].filter(id => id !== tweetId);
 
-            twit.likes--;
+            tweet.likes--;
 
             return {
-                count: twit.likes,
+                count: tweet.likes,
                 likedByUser: false
             }
+        });
+
+        this.get("/users/me", (schema, request) => {
+
+            const token = request.requestHeaders['Authorization'];
+
+            const decoded = decodeToken(token);
+            const { sub: id, name, nickname: username } = decoded;
+
+            return {
+                id, name, username
+            }
+        });
+
+        this.get("/users/:username", (schema, request) => {
+
+            const { username } = request.params;
+
+            const author = authors.find(author => author.username === username);
+
+            if (author) {
+
+                return {
+                    id: author.id,
+                    name: author.name,
+                    username: author.username
+                }
+            }
+
+            return new Response(404);
         });
     },
 });
