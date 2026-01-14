@@ -56,17 +56,17 @@ export default function Header() {
 
   return (
     <>
-      <header className="container mx-auto p-6 text-white flex flex-row justify-between items-center">
+      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-white flex flex-row justify-between items-center">
         <Link
           to="/"
           className="hover:opacity-80 transition-opacity duration-200 flex items-center gap-2"
         >
           <img src={LogoLight} alt="Kiwitter logo" className="w-6 h-6" />
-          <h1 className="text-3xl font-display font-bold tracking-wide">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-wide">
             kiwitter
           </h1>
         </Link>
-        <nav className="font-body font-bold text-sm flex flex-row gap-4 items-center">
+        <nav className="font-body font-bold text-sm flex flex-row flex-wrap gap-3 sm:gap-4 items-center justify-end text-right">
           {links}
         </nav>
       </header>

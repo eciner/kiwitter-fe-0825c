@@ -105,11 +105,11 @@ const Post = memo(function Post({
   return (
     <div>
       <div
-        className={`flex flex-row container mx-auto bg-white w-[40vw] rounded-xl ${
+        className={`flex flex-col sm:flex-row container mx-auto bg-white w-full max-w-3xl rounded-xl ${
           isRepliesVisible ? "rounded-b-none" : ""
-        } shadow-xl hover:shadow-2xl p-4 gap-6 transition-all duration-200 hover:bg-gray-100 ${className}`}
+        } shadow-xl hover:shadow-2xl p-4 sm:p-5 md:p-6 gap-4 sm:gap-6 transition-all duration-200 hover:bg-gray-100 ${className}`}
       >
-        <div className="flex flex-col justify-start w-24">
+        <div className="flex flex-col justify-start w-20 sm:w-24 self-start flex-shrink-0">
           <img
             onClick={handleProfileClick}
             src={`https://i.pravatar.cc/150?u=${post.authorId}`}

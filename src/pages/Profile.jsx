@@ -80,11 +80,11 @@ export default function Profile() {
 
   return (
     <PageLayout className="">
-      <div className="flex flex-col container mx-auto w-[60vw] p-4 gap-6 items-center">
+      <div className="flex flex-col container mx-auto w-full max-w-4xl p-4 sm:p-6 gap-6 items-center">
         <img
           src={`https://i.pravatar.cc/1200?u=${userInfo.id}`}
           alt={userInfo.name}
-          className="w-48 rounded-full aspect-square cursor-pointer shadow-2xl border-4 border-white/10 hover:shadow-primary/30 hover:scale-105 transition-all duration-300"
+          className="w-32 sm:w-40 md:w-48 rounded-full aspect-square cursor-pointer shadow-2xl border-4 border-white/10 hover:shadow-primary/30 hover:scale-105 transition-all duration-300"
         />
         <div className="text-center">
           <h1 className="text-3xl font-heading font-bold text-white pb-1">
@@ -96,8 +96,8 @@ export default function Profile() {
         </div>
         {isCurrentUser && <PostEditor addPost={handleAddPost} />}
         {isCurrentUser && (
-          <nav className="w-[40vw]">
-            <ul className="flex flex-row gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20">
+          <nav className="w-full max-w-3xl mx-auto overflow-x-auto">
+            <ul className="flex flex-row gap-4 sm:gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20 whitespace-nowrap">
               <li>
                 <a
                   className={

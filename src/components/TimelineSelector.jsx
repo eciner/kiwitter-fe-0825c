@@ -2,8 +2,8 @@ import PropTypes from "prop-types";
 
 export default function TimelineSelector({ setMode, mode }) {
   return (
-    <nav className="w-[40vw]">
-      <ul className="flex flex-row gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20">
+    <nav className="w-full max-w-3xl mx-auto overflow-x-auto">
+      <ul className="flex flex-row gap-4 sm:gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20 whitespace-nowrap">
         <li>
           <a
             className={

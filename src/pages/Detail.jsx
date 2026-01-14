@@ -51,7 +51,7 @@ export default function Detail() {
 
   return (
     <PageLayout className="">
-      <div className="flex flex-col container mx-auto w-[60vw] p-4 gap-6 items-center">
+      <div className="flex flex-col container mx-auto w-full max-w-3xl p-4 sm:p-6 gap-6 items-center">
         <Post post={tweet} isDetail={true} />
       </div>
     </PageLayout>

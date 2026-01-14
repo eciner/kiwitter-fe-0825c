@@ -53,7 +53,7 @@ export default function ReplyEditor({
 
   return (
     <div
-      className={`flex flex-col container mx-auto bg-white w-[40vw] rounded-xl shadow-xl p-4 gap-6 ${className}`}
+      className={`flex flex-col container mx-auto bg-white w-full max-w-3xl rounded-xl shadow-xl p-4 sm:p-5 md:p-6 gap-6 ${className}`}
     >
       <h3 className="text-lg font-heading font-bold text-gray-900">
         Yanıt Yaz

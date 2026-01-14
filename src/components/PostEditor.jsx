@@ -51,11 +51,11 @@ const PostEditor = memo(function PostEditor({
 
   return (
     <div
-      className={`flex flex-col container mx-auto ${
+      className={`flex flex-col container mx-auto w-full max-w-3xl ${
         isReply
           ? "bg-gray-50 rounded-lg shadow-sm border border-gray-200"
           : "bg-white rounded-xl shadow-xl"
-      } w-[40vw] p-4 gap-4 ${className}`}
+      } p-4 sm:p-5 md:p-6 gap-4 ${className}`}
     >
       <form onSubmit={handleSubmit}>
         <textarea

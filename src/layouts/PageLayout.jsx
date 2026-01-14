@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 export default function PageLayout({
   children,
-  className = "container mx-auto bg-white min-h-96 rounded-xl shadow-xl p-6 transition-all duration-300 hover:shadow-2xl ",
+  className = "container mx-auto w-full max-w-5xl bg-white min-h-96 rounded-none sm:rounded-xl shadow-xl px-4 sm:px-6 md:px-8 py-6 transition-all duration-300 hover:shadow-2xl",
 }) {
   return (
     <div className="relative">

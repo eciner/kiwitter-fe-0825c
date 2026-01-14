@@ -16,7 +16,7 @@ const Replies = memo(function Replies({ parentPost, replies }) {
   );
 
   return (
-    <div className="flex flex-col container mx-auto bg-white w-[40vw] rounded-b-xl shadow-2xl p-6 gap-5 border-t-4 border-primary transition-all duration-300">
+    <div className="flex flex-col container mx-auto bg-white w-full max-w-3xl rounded-b-xl shadow-2xl p-4 sm:p-5 md:p-6 gap-5 border-t-4 border-primary transition-all duration-300">
       <div className="flex flex-col gap-3 pb-4 border-b border-gray-200">
         <h3 className="text-sm font-heading font-bold text-primary uppercase tracking-wide">
           Yanıtlar
