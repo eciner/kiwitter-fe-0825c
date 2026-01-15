@@ -1,64 +1,90 @@
-# Kiwitter - Twitter Clone 🐦
+# Kiwitter – Twitter Clone Frontend
 
-A modern, feature-rich Twitter clone built with React, Redux Toolkit, and Tailwind CSS.
+A fully functional Twitter clone built with React, Redux Toolkit, and Tailwind CSS. This project demonstrates modern React patterns, state management best practices, and component-driven architecture.
 
-## � Table of Contents
+## 📋 Table of Contents
 
-- [Project Status](#-project-status)
-- [Getting Started](#-getting-started)
-- [Tech Stack](#%EF%B8%8F-tech-stack)
-- [Project Structure](#-project-structure)
-- [Available Scripts](#-available-scripts)
-- [API Endpoints](#-api-endpoints-mock---miragejs)
-- [Usage Examples](#-usage-examples)
-- [Features](#-ui-highlights--design)
-- [Troubleshooting](#%EF%B8%8F-troubleshooting)
-- [Learning Resources](#-learning-resources)
+- [Project Overview](#project-overview)
+- [Core Features](#core-features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [API Endpoints (Mock)](#api-endpoints-mock)
+- [Available Scripts](#available-scripts)
+- [Development Notes](#development-notes)
+- [Troubleshooting](#troubleshooting)
+- [Learning Outcomes](#learning-outcomes)
 
-## �📊 Project Status
+## 🎯 Project Overview
 
-### ✅ Completed Features
+Kiwitter is a fully functional Twitter clone featuring real-time interactions, nested conversations, and a responsive design. Built as part of the WorkinTech Frontend Development Bootcamp, this project showcases modern React patterns, Redux state management, and component-driven architecture.
 
-- **🔐 User Authentication**: JWT-based registration and login system
-- **📝 Tweet Management**: Create, view, delete, and detail view of tweets (160 char limit)
-- **💬 Social Interactions**: Like/unlike tweets, reply functionality with nested threading
-- **👤 User Profiles**: View user-specific tweets and activity
-- **📊 Multiple Timeline Views**:
-  - Normal timeline (chronological feed)
-  - Popular timeline (top tweets from last 24h sorted by likes)
-- **⚡ Real-time Updates**: Optimistic UI updates with Redux state management
-- **📱 Responsive Design**: Mobile-first design with Tailwind CSS
-- **🧪 Mock API**: MirageJS for development and testing (100 tweets with replies)
-- **🎨 Error Boundaries**: Error handling with ErrorBoundary component
-- **�️ Protected Routes**: Authentication checks on protected pages
-- **📋 Login Modal**: Modal-based login component for seamless UX
+## ✅ Core Features
 
-### 🔄 In Progress / Features to Enhance
+- **🔐 Authentication System**
 
-- Advanced user profile features (bio, avatar, follow system)
-- Search and filter functionality
-- Tweet editing capability
-- Notification system
-- Dark mode theme toggle
-- User suggestions/recommendations
-- Trending topics
-- Media upload for tweets
+  - JWT-based registration and login
+  - Token persistence via localStorage
+  - Modal-based login for seamless UX
+  - Protected routes with authorization checks
+
+- **📝 Tweet Management**
+
+  - Create tweets (160 character limit)
+  - Delete tweets (owner-only)
+  - View tweet details and threads
+  - Real-time character counter
+
+- **💬 Social Interactions**
+
+  - Like/unlike tweets with optimistic updates
+  - Nested reply system (threaded conversations)
+  - Reply detail pages with parent tweet context
+  - Newest-first reply sorting
+
+- **👤 User Profiles**
+
+  - View user-specific tweets, replies, and liked tweets
+  - Tab-based navigation (Tweets / Likes / Replies)
+  - Profile creation and tweet composer integration
+  - Ownership-based action gating
+
+- **📊 Multiple Timeline Modes**
+
+  - Timeline: Chronological feed of all tweets
+  - Tweets: User's own tweets only
+  - Replies: User's reply history
+  - Most Liked: Popular tweets from last 24h (sorted by likes)
+
+- **🎨 UI/UX Excellence**
+  - Responsive mobile-first design
+  - Smooth animations and transitions
+  - Toast notifications for user feedback
+  - Error boundaries for graceful error handling
+  - Loading states and skeleton screens
+  - Custom brand identity (raven logo, KiWi Indigo theme)
 
 ## 🛠️ Tech Stack
 
-- **React 18.3** - UI Library
-- **Redux Toolkit 2.11** - State Management
-- **React Router DOM 5.2** - Client-side Routing
-- **Tailwind CSS 3.4** - Utility-first CSS
-- **Vite 5.4** - Build Tool & Dev Server
-- **Axios** - HTTP Client
-- **MirageJS** - API Mocking
-- **React Hook Form** - Form Validation
-- **React Toastify** - Notifications
-- **Day.js** - Date Formatting
-- **Bootstrap Icons** - Icon Library
+### Core Technologies
 
-## � Getting Started
+- **[React 18.3](https://react.dev/)** - UI library with hooks and functional components
+- **[Redux Toolkit 2.11](https://redux-toolkit.js.org/)** - State management with slices pattern
+- **[React Router DOM 5.2](https://v5.reactrouter.com/)** - Client-side routing
+- **[Tailwind CSS 3.4](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Vite 5.4](https://vitejs.dev/)** - Next-generation frontend build tool
+
+### Supporting Libraries
+
+- **[Axios 1.7.7](https://axios-http.com/)** - HTTP client with interceptors
+- **[MirageJS 0.1.48](https://miragejs.com/)** - API mocking for development
+- **[jwt-decode 4.0.0](https://github.com/auth0/jwt-decode)** - JWT token decoding
+- **[React Toastify 11.0.5](https://fkhadra.github.io/react-toastify/)** - Toast notifications
+- **[Day.js 1.11.19](https://day.js.org/)** - Date formatting and manipulation
+- **[Bootstrap Icons 1.13.1](https://icons.getbootstrap.com/)** - Icon library
+- **[PropTypes 15.8.1](https://www.npmjs.com/package/prop-types)** - PropTypes runtime type checking for components
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -87,195 +113,239 @@ A modern, feature-rich Twitter clone built with React, Redux Toolkit, and Tailwi
    ```
 
 4. **Open in browser**
-   - Navigate to `http://localhost:5173`
-   - You'll see the Kiwitter app with mock data ready to use
+   - Navigate to `http://localhost:5176` (configured in vite.config.js)
+   - The app will launch with 100 pre-generated tweets and replies
 
 ### Quick Test
 
-- **Login Test Account**: Use any email and password (mock authentication)
-- **Sample Data**: 100 pre-generated tweets with replies available
-- **No Backend Setup**: All API calls are mocked with MirageJS
+The app uses MirageJS for a complete mock backend - no server setup required!
+
+- **Test Login**: Use any username from the mock data (e.g., `chaotic_orange`, `sunny_rose`) with any password
+- **Create Account**: Sign up with any credentials - new users are automatically added to the mock database
+- **Sample Data**: 100 tweets with 3 nested replies each, generated on startup
+- **Full Functionality**: All CRUD operations, likes, replies, and authentication work seamlessly
+
+## 📁 Project Structure
 
 ```
 kiwitter-fe/
 ├── src/
 │   ├── components/               # Reusable UI components
-│   │   ├── Header.jsx           # Navigation header with user info
-│   │   ├── Post.jsx             # Tweet display component
-│   │   ├── PostEditor.jsx       # Create/edit tweet component
-│   │   ├── Replies.jsx          # Display tweet replies
-│   │   ├── ReplyEditor.jsx      # Create reply component
+│   │   ├── ErrorBoundary.jsx    # Error handling wrapper
+│   │   ├── Header.jsx           # Navigation & user info
+│   │   ├── LoginModal.jsx       # Modal login form
+│   │   ├── Post.jsx             # Tweet display card
+│   │   ├── PostEditor.jsx       # Tweet/reply composer
+│   │   ├── Replies.jsx          # Reply list container
+│   │   ├── ReplyEditor.jsx      # Reply form component
 │   │   ├── Timeline.jsx         # Tweet feed display
-│   │   ├── TimelineSelector.jsx # Timeline view switcher
-│   │   ├── LoginModal.jsx       # Login modal dialog
-│   │   └── ErrorBoundary.jsx    # Error handling component
+│   │   └── TimelineSelector.jsx # Mode switcher tabs
 │   ├── layouts/                  # Layout wrappers
-│   │   ├── AuthLayout.jsx       # Auth page layout
+│   │   ├── AuthLayout.jsx       # Auth pages wrapper
 │   │   └── PageLayout.jsx       # Main app layout
-│   ├── pages/                    # Route pages
+│   ├── pages/                    # Route-level pages
+│   │   ├── Detail.jsx           # Tweet detail/thread view
 │   │   ├── Home.jsx             # Home timeline
 │   │   ├── Login.jsx            # Login page
-│   │   ├── Signup.jsx           # User registration
-│   │   ├── Profile.jsx          # User profile page
-│   │   └── Detail.jsx           # Tweet detail/thread view
-│   ├── redux/                    # State management (Redux Toolkit)
-│   │   ├── store.js             # Redux store configuration
-│   │   ├── tweetsSlice.js       # Tweets state & reducers
-│   │   ├── twitsSlice.js        # Alternative tweets slice
-│   │   └── userSlice.js         # User state & reducers
-│   ├── utils/                    # Helper functions & utilities
-│   │   ├── auth.js              # Authentication utilities
-│   │   ├── axios.js             # HTTP client configuration
-│   │   └── devserver.js         # Development server setup
-│   ├── icon/                     # Icon assets
+│   │   ├── Profile.jsx          # User profile view
+│   │   └── Signup.jsx           # Registration page
+│   ├── redux/                    # Redux Toolkit state
+│   │   ├── store.js             # Store configuration
+│   │   ├── tweetsSlice.js       # Tweets state & selectors
+│   │   ├── twitsSlice.js        # Compatibility re-export
+│   │   └── userSlice.js         # Auth state & user info
+│   ├── utils/                    # Helper functions
+│   │   ├── auth.js              # LocalStorage token helpers
+│   │   ├── axios.js             # HTTP client config
+│   │   ├── devserver.js         # MirageJS mock server
+│   │   └── ownership.js         # Authorization checks
+│   ├── icon/                     # SVG logo assets
 │   ├── App.jsx                   # Root component
-│   ├── main.jsx                  # App entry point
-│   ├── App.css                   # App styles
-│   └── index.css                 # Global styles
+│   ├── main.jsx                  # Entry point
+│   ├── App.css                   # Component styles
+│   └── index.css                 # Global styles + animations
 ├── public/                       # Static assets
 ├── package.json                  # Dependencies & scripts
 ├── vite.config.js               # Vite configuration
-├── tailwind.config.js           # Tailwind CSS configuration
-├── postcss.config.js            # PostCSS configuration
-└── eslint.config.js             # ESLint configuration
+├── tailwind.config.js           # Tailwind theme & colors
+├── postcss.config.js            # PostCSS plugins
+└── eslint.config.js             # ESLint rules
 ```
 
-## 🎯 Available Scripts
+## 🌐 API Endpoints (Mock)
+
+All endpoints are provided by MirageJS mock server configured in `src/utils/devserver.js`.
+
+### Authentication
+
+| Method | Endpoint  | Description       | Auth Required |
+| ------ | --------- | ----------------- | ------------- |
+| POST   | `/login`  | User login        | ❌            |
+| POST   | `/signup` | User registration | ❌            |
+
+### Tweets
+
+| Method | Endpoint              | Description                | Auth Required |
+| ------ | --------------------- | -------------------------- | ------------- |
+| GET    | `/tweets`             | Get all tweets             | Optional      |
+| POST   | `/tweets`             | Create new tweet           | ✅            |
+| GET    | `/tweets/:id`         | Get tweet detail/thread    | Optional      |
+| DELETE | `/tweets/:id`         | Delete tweet (owner/admin) | ✅            |
+| POST   | `/tweets/:id/like`    | Like tweet                 | ✅            |
+| DELETE | `/tweets/:id/like`    | Unlike tweet               | ✅            |
+| POST   | `/tweets/:id/replies` | Reply to tweet             | ✅            |
+
+### Users
+
+| Method | Endpoint           | Description      | Auth Required |
+| ------ | ------------------ | ---------------- | ------------- |
+| GET    | `/users/me`        | Get current user | ✅            |
+| GET    | `/users/:username` | Get user profile | Optional      |
+
+**Note**: When authenticated, the `Authorization` header should contain the JWT token in `Bearer <token>` format.
+
+## ⚡ Features
+
+### Architecture Highlights
+
+- **Redux Toolkit State Management**
+
+  - Centralized state for tweets and authentication
+  - Optimistic UI updates for better UX
+  - Selector patterns for filtered views (timeline modes)
+  - Nested reply handling with recursive helpers
+
+- **Component-Driven Design**
+
+  - Reusable, composable components with PropTypes validation
+  - Separation of concerns (pages/layouts/components)
+  - Conditional styling patterns for replies vs main tweets
+  - Error boundaries for graceful degradation
+
+- **Authentication Flow**
+
+  - JWT-like token generation and decoding
+  - LocalStorage persistence with axios interceptors
+  - Automatic session restoration on page reload
+  - 401 response handling with automatic logout
+
+- **Mock API Integration**
+  - 100 pre-generated tweets with nested replies
+  - Recursive tweet/reply lookup functions
+  - User-specific like tracking
+  - Token-based authorization simulation
+
+### UI/UX Features
+
+- **Responsive Design**: Mobile-first design using Tailwind CSS with custom KiWi Indigo theme
+- **Smooth Animations**: Fade-in animations for replies with staggered 50ms delays between items
+- **Toast Notifications**: User feedback for all actions (success and error messages)
+- **Loading States**: Loading indicators and graceful empty states throughout the interface
+- **Character Counter**: Real-time tweet length validation with visual feedback at 160 character limit
+- **Relative Timestamps**: Human-readable dates and times using Day.js
+- **Modal Login**: In-context authentication without navigating away from current page
+- **Brand Identity**: Custom raven logo with light and dark variants for theme support
+
+## 📜 Available Scripts
 
 ```bash
-npm run dev      # Start dev server at http://localhost:5173
-npm run build    # Build for production (creates dist/ folder)
+# Development
+npm run dev      # Start dev server at http://localhost:5176
+npm run build    # Build for production (output: dist/)
 npm run preview  # Preview production build locally
-npm run lint     # Run ESLint to check code quality
+
+# Code Quality
+npm run lint     # Run ESLint checks
 ```
-
-## 🔌 API Endpoints (Mock - MirageJS)
-
-| Method | Endpoint             | Description             | Status  |
-| ------ | -------------------- | ----------------------- | ------- |
-| POST   | `/login`             | User login              | ✅ Done |
-| POST   | `/signup`            | User registration       | ✅ Done |
-| GET    | `/twits`             | Get all tweets          | ✅ Done |
-| POST   | `/twits`             | Create tweet            | ✅ Done |
-| DELETE | `/twits/:id`         | Delete tweet            | ✅ Done |
-| POST   | `/twits/:id/like`    | Like tweet              | ✅ Done |
-| DELETE | `/twits/:id/like`    | Unlike tweet            | ✅ Done |
-| POST   | `/twits/:id/replies` | Reply to tweet          | ✅ Done |
-| GET    | `/twits/popular`     | Get popular tweets      | ✅ Done |
-| GET    | `/twits/:id`         | Get tweet detail/thread | ✅ Done |
-| GET    | `/users/:username`   | Get user profile        | ✅ Done |
-
-## 💡 Usage Examples
-
-### Running the Development Server
-
-```bash
-npm install      # Install dependencies (first time only)
-npm run dev      # Start the development server
-# Open browser to http://localhost:5173
-```
-
-### Building for Production
-
-```bash
-npm run build    # Creates optimized build in dist/ folder
-npm run preview  # Preview production build locally
-```
-
-### Code Quality
-
-```bash
-npm run lint     # Check for linting issues
-# Fix common issues: eslint . --fix
-```
-
-## 🎨 UI Highlights & Design
-
-- **Primary Theme Color**: `#121054` (KiWi Indigo)
-- **Responsive Design**: Fully responsive for desktop, tablet, and mobile devices
-- **Toast Notifications**: User feedback for actions (success, error, info)
-- **Real-time Character Counter**: Tweet composer with live character count
-- **Loading States**: Smooth loading indicators during API calls
-- **Error Handling**: Comprehensive error boundary and user feedback
-- **Form Validation**: Client-side validation with React Hook Form
-- **Dark-Friendly**: Adaptable color scheme for various themes
-
-## 🔐 Authentication & Security
-
-- **JWT Tokens**: JSON Web Tokens for secure authentication
-- **LocalStorage**: Tokens stored securely in browser localStorage
-- **Protected Routes**: Authorization checks prevent unauthorized access
-- **Token Expiration**: Automatic token refresh and logout on expiration
-- **Password Encryption**: Server-side password hashing (mock implementation)
-
-## 🧪 Testing & Development
-
-- **Mock API (MirageJS)**: Complete API mocking for offline development
-- **Sample Data**: 100 pre-generated tweets with 3 replies each
-- **ESLint**: Automatic code quality checks
-- **Hot Module Replacement**: Fast refresh during development with Vite
-
-## 📦 Dependencies Overview
-
-| Package          | Version | Purpose                 |
-| ---------------- | ------- | ----------------------- |
-| React            | 18.3.1  | UI library              |
-| Redux Toolkit    | 2.11.2  | State management        |
-| React Router DOM | 5.2     | Client-side routing     |
-| Tailwind CSS     | 3.4.12  | Utility-first CSS       |
-| Vite             | 5.4.1   | Build tool & dev server |
-| Axios            | 1.7.7   | HTTP client             |
-| MirageJS         | 0.1.48  | API mocking             |
-| React Hook Form  | 7.53.0  | Form handling           |
-| React Toastify   | 11.0.5  | Notifications           |
-| Day.js           | 1.11.19 | Date formatting         |
-| Bootstrap Icons  | 1.13.1  | Icon library            |
 
 ## 📝 Development Notes
 
-- **Mock Server**: MirageJS generates 100 sample tweets with 3 replies each on startup
-- **JWT Tokens**: Stored in `localStorage` for persistent authentication across sessions
-- **PropTypes**: All components validate prop types for type safety
-- **ESLint Configuration**: Enforces code quality and React best practices
-- **Separation of Concerns**: Clean folder structure (components, pages, redux, utils)
-- **Redux Patterns**: Slices pattern for reducers, actions, and state management
-- **Hot Reload**: Vite provides fast refresh (~100ms) for rapid development
-- **Component Reusability**: Designed for composition and flexible prop passing
+### Key Implementation Details
 
-## 🛠️ Troubleshooting
+- **Port Configuration**: Dev server runs on port `5176` (configured in `vite.config.js`)
+- **Mock Data Generation**: MirageJS generates 100 tweets with 3 replies each on startup
+- **Token Format**: JWT-like structure with base64-encoded header/payload/signature
+- **Reply Sorting**: Newest-first display using `[...replies].sort((a, b) => b.createDate - a.createDate)`
+- **Recursive Operations**: Tweet/reply lookup and deletion support nested structures
+- **Timeline Modes**: Implemented via Redux selectors with filtering logic
+- **Ownership Checks**: `isPostOwner()` utility compares decoded token `sub` with `authorId`
+- **Axios Interceptor**: Automatically clears auth state on 401 responses
 
-### Issue: "Cannot find module" errors
+### Custom Tailwind Theme
 
-**Solution**: Run `npm install` to ensure all dependencies are installed
+```javascript
+colors: {
+  primary: '#121054',   // KiWi Indigo
+  accent: '#1a1670',    // Accent purple
+  dark: '#0a0830',      // Dark background
+}
+fontFamily: {
+  'display': ['Kite One', 'cursive'],
+  'heading': ['Domine', 'serif'],
+  'body': ['Nunito', 'sans-serif'],
+}
+```
 
-### Issue: Port 5173 already in use
+### Code Quality Standards
 
-**Solution**: Vite will automatically try the next available port, or specify: `npm run dev -- --port 3000`
+- ✅ **PropTypes**: All components have runtime type validation
+- ✅ **ESLint**: React best practices enforced
+- ✅ **No Console Logs**: Production code is clean (errors use toasts)
+- ✅ **Consistent Styling**: Tailwind utility patterns across all components
+- ✅ **Hot Module Replacement**: Vite provides ~100ms refresh cycles
 
-### Issue: Tweets not appearing
+## 🔧 Troubleshooting
 
-**Solution**: Check browser console for errors, ensure MirageJS is initialized in `main.jsx`
+### Common Issues
 
-### Issue: Authentication token expired
+**"Cannot find module" errors**
 
-**Solution**: Log out and log in again, or clear localStorage and refresh
+- Run `npm install` to ensure all dependencies are installed
+- Delete `node_modules/` and `package-lock.json`, then reinstall
 
-## 🎓 Learning Resources
+**Port already in use**
 
-This project demonstrates:
+- Default port is 5176 (not 5173)
+- Vite will automatically try next available port
+- Or specify custom port: `npm run dev -- --port 3000`
 
-- React 18 functional components and hooks
-- Redux Toolkit slices and async thunks
-- React Router navigation and protected routes
-- Tailwind CSS utility-first styling
-- Responsive design patterns
-- Form validation with React Hook Form
-- HTTP requests with Axios
-- API mocking with MirageJS
-- Component composition and reusability
-- State management best practices
-- WorkinTech Frontend Development Bootcamp curriculum
+**Tweets not appearing**
+
+- Check browser console for errors
+- Verify MirageJS is initialized in `main.jsx`
+- Ensure devserver.js is imported in App.jsx
+
+**Authentication issues**
+
+- Token stored in localStorage under key determined by auth.js
+- Log out and log back in to refresh token
+- Clear localStorage and refresh if persistent
+
+**Build errors**
+
+- Ensure all `.jsx` file extensions are explicit in imports
+- Check that PropTypes are imported where used
+- Verify Tailwind classes are valid
+
+## 🎓 Learning Outcomes
+
+This project demonstrates practical implementation of:
+
+- **React 18**: Functional components, hooks (useState, useEffect, useSelector, useDispatch)
+- **Redux Toolkit**: Slices pattern, reducers, actions, selectors, and centralized state
+- **React Router v5**: Client-side routing with params and protected routes
+- **Tailwind CSS**: Utility-first styling with custom theme extensions
+- **Component Architecture**: Separation of concerns (pages/layouts/components/utils)
+- **State Patterns**: Optimistic updates, recursive data structures, filtering
+- **Authentication**: Token-based auth with localStorage persistence
+- **API Integration**: HTTP client setup, interceptors, mock API development
+- **Error Handling**: Error boundaries, toast notifications, graceful degradation
+- **Code Quality**: PropTypes validation, ESLint rules, consistent patterns
 
 ## 📄 License
 
-Part of WorkinTech Frontend Development Bootcamp - Educational Project
+Educational project developed as part of **WorkinTech Frontend Development Bootcamp** curriculum.
+
+---
+
+**Built with ❤️ using React, Redux Toolkit, and Tailwind CSS**

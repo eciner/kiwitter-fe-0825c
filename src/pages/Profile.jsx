@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectTweetsByUsername,
+  selectTweets,
   loadTweets,
   addTweet,
 } from "../redux/tweetsSlice.js";
@@ -58,8 +59,16 @@ export default function Profile() {
   }, [dispatch]);
 
   const allTweets = useSelector(selectTweetsByUsername(username));
-  const likedTweets = useSelector((state) =>
-    state.tweets.tweets.filter((tweet) => tweet.likedByUser === true)
+  const flattenedTimeline = useSelector(selectTweets("timeline"));
+  const likedTweets = flattenedTimeline.filter(
+    (tweet) => tweet.likedByUser === true
+  );
+
+  // Get all replies made by the user (including nested replies)
+  const userReplies = useSelector((state) =>
+    selectTweets("replies")(state)
+      .filter((reply) => reply.username === username)
+      .sort((a, b) => b.createDate - a.createDate)
   );
 
   const handleAddPost = (post) => {
@@ -76,13 +85,20 @@ export default function Profile() {
     );
   }
 
-  const displayedTweets = activeTab === "tweets" ? allTweets : likedTweets;
+  const displayedTweets =
+    activeTab === "tweets"
+      ? allTweets
+      : activeTab === "likes"
+      ? likedTweets
+      : userReplies;
 
   return (
     <PageLayout className="">
       <div className="flex flex-col container mx-auto w-full max-w-4xl p-4 sm:p-6 gap-6 items-center">
         <img
-          src={`https://i.pravatar.cc/1200?u=${userInfo.id}`}
+          src={`https://i.pravatar.cc/1200?u=${
+            allTweets.length > 0 ? allTweets[0].authorId : userInfo.id
+          }`}
           alt={userInfo.name}
           className="w-32 sm:w-40 md:w-48 rounded-full aspect-square cursor-pointer shadow-2xl border-4 border-white/10 hover:shadow-primary/30 hover:scale-105 transition-all duration-300"
         />
@@ -95,44 +111,63 @@ export default function Profile() {
           </span>
         </div>
         {isCurrentUser && <PostEditor addPost={handleAddPost} />}
-        {isCurrentUser && (
-          <nav className="w-full max-w-3xl mx-auto overflow-x-auto">
-            <ul className="flex flex-row gap-4 sm:gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20 whitespace-nowrap">
+        <nav
+          className="w-full max-w-3xl mx-auto overflow-x-auto"
+          aria-label="Profile tabs"
+        >
+          <ul
+            className="flex flex-row gap-4 sm:gap-6 text-white mt-4 px-2 text-sm font-body font-semibold border-b border-white/20 whitespace-nowrap"
+            role="tablist"
+          >
+            <li>
+              <button
+                className={`${
+                  activeTab === "tweets"
+                    ? "border-b-2 pb-2 border-white font-bold transition-all inline-block"
+                    : "pb-2 inline-block font-semibold hover:text-gray-200 hover:border-b-2 hover:border-gray-300 transition-all"
+                } bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded`}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "tweets"}
+                onClick={() => setActiveTab("tweets")}
+              >
+                Tweetler
+              </button>
+            </li>
+            {isCurrentUser && (
               <li>
-                <a
-                  className={
-                    activeTab === "tweets"
-                      ? "border-b-2 pb-2 border-white font-bold transition-all inline-block"
-                      : "pb-2 inline-block font-semibold hover:text-gray-200 hover:border-b-2 hover:border-gray-300 transition-all"
-                  }
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveTab("tweets");
-                  }}
-                >
-                  Tweetlerim
-                </a>
-              </li>
-              <li>
-                <a
-                  className={
+                <button
+                  className={`${
                     activeTab === "likes"
                       ? "border-b-2 pb-2 border-white font-bold transition-all inline-block"
                       : "pb-2 inline-block font-semibold hover:text-gray-200 hover:border-b-2 hover:border-gray-300 transition-all"
-                  }
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveTab("likes");
-                  }}
+                  } bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "likes"}
+                  onClick={() => setActiveTab("likes")}
                 >
                   Beğendiklerim
-                </a>
+                </button>
               </li>
-            </ul>
-          </nav>
-        )}
+            )}
+            <li>
+              <button
+                className={`${
+                  activeTab === "replies"
+                    ? "border-b-2 pb-2 border-white font-bold transition-all inline-block"
+                    : "pb-2 inline-block font-semibold hover:text-gray-200 hover:border-b-2 hover:border-gray-300 transition-all"
+                } bg-transparent border-0 p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded`}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "replies"}
+                onClick={() => setActiveTab("replies")}
+              >
+                Yanıtlar
+              </button>
+            </li>
+          </ul>
+        </nav>
         <Timeline
           posts={displayedTweets}
           isLoading={isLoading}

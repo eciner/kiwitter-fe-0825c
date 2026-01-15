@@ -10,13 +10,18 @@ const userSlice = createSlice({
   },
   reducers: {
     login: (state, action) => {
+      try {
+        const decoded = jwtDecode(action.payload);
 
-      const decoded = jwtDecode(action.payload);
+        state.token = action.payload;
+        state.user = decoded;
 
-      state.token = action.payload;
-      state.user = decoded;
-
-      setAuthToken(action.payload);
+        setAuthToken(action.payload);
+      } catch (error) {
+        state.token = null;
+        state.user = null;
+        removeAuthToken();
+      }
     },
     logout: (state) => {
 

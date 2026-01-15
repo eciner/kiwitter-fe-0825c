@@ -81,6 +81,43 @@ function generateObjects(n, fillReplies = false) {
     return objects;
 }
 
+function findTweetByIdRecursive(tweetsList, tweetId) {
+    for (const tweet of tweetsList) {
+        if (tweet.id === tweetId) {
+            return tweet;
+        }
+        if (tweet.replies && tweet.replies.length > 0) {
+            const found = findTweetByIdRecursive(tweet.replies, tweetId);
+            if (found) {
+                return found;
+            }
+        }
+    }
+    return null;
+}
+
+function removeTweetByIdRecursive(tweetsList, tweetId) {
+    let removed = false;
+
+    for (let i = tweetsList.length - 1; i >= 0; i--) {
+        const tweet = tweetsList[i];
+        if (tweet.id === tweetId) {
+            tweetsList.splice(i, 1);
+            removed = true;
+            continue;
+        }
+
+        if (tweet.replies && tweet.replies.length > 0) {
+            const removedInReplies = removeTweetByIdRecursive(tweet.replies, tweetId);
+            if (removedInReplies) {
+                removed = true;
+            }
+        }
+    }
+
+    return removed;
+}
+
 const tweetsLikedByUser = {
 
 }
@@ -204,7 +241,7 @@ createServer({
 
             const newTweet = {
                 "id": window.crypto.randomUUID(),
-                "authorId": 1000,
+                "authorId": decoded.sub,
                 "retweets": 0,
                 "content": content,
                 "createDate": Date.now(),
@@ -221,60 +258,30 @@ createServer({
             }
         });
 
-        this.get("/tweets/:tweetId", (schema, request) => {
+        // More specific routes first for MirageJS routing
+        this.delete("/tweets/:tweetId/like", (schema, request) => {
+
             const { tweetId } = request.params;
             const token = request.requestHeaders['Authorization'];
+
+            const decoded = decodeToken(token);
+            const { sub: userId } = decoded;
 
             const tweet = tweets.find(tweet => tweet.id === tweetId);
 
-            if (!tweet) {
-                return new Response(404, {}, { error: "Tweet not found" });
+            if (!tweetsLikedByUser[userId]) {
+
+                return new Response(200);
             }
 
-            if (token) {
-                const decoded = decodeToken(token);
-                const userId = decoded?.sub;
-                return {
-                    ...tweet,
-                    likedByUser: userId && tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
-                };
-            }
+            tweetsLikedByUser[userId] = tweetsLikedByUser[userId].filter(id => id !== tweetId);
 
-            return tweet;
-        });
-
-        this.post("/tweets/:tweetId/replies", (schema, request) => {
-            const { tweetId } = request.params;
-            const token = request.requestHeaders['Authorization'];
-            const { content } = JSON.parse(request.requestBody);
-
-            const decoded = decodeToken(token);
-            const { sub: authorId, name, nickname: username } = decoded;
-
-            const parentTweet = tweets.find(tweet => tweet.id === tweetId);
-
-            if (!parentTweet) {
-                return new Response(404, {}, { error: "Tweet not found" });
-            }
-
-            const newReply = {
-                "id": Math.random().toString(36).substring(2, 15),
-                "content": content,
-                "name": name,
-                "username": username,
-                "authorId": authorId,
-                "createDate": Date.now(),
-                "likes": 0,
-                "retweets": 0,
-                "likedByUser": false,
-                "replies": []
-            };
-
-            parentTweet.replies.push(newReply);
+            tweet.likes--;
 
             return {
-                reply: newReply
-            };
+                count: tweet.likes,
+                likedByUser: false
+            }
         });
 
         this.post("/tweets/:tweetId/like", (schema, request) => {
@@ -303,29 +310,86 @@ createServer({
             }
         });
 
-        this.delete("/tweets/:tweetId/like", (schema, request) => {
+        this.post("/tweets/:tweetId/replies", (schema, request) => {
+            const { tweetId } = request.params;
+            const token = request.requestHeaders['Authorization'];
+            const { content } = JSON.parse(request.requestBody);
 
+            const decoded = decodeToken(token);
+            const { sub: authorId, name, nickname: username } = decoded;
+
+            const parentTweet = findTweetByIdRecursive(tweets, tweetId);
+
+            if (!parentTweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
+            }
+
+            const newReply = {
+                "id": Math.random().toString(36).substring(2, 15),
+                "content": content,
+                "name": name,
+                "username": username,
+                "authorId": authorId,
+                "createDate": Date.now(),
+                "likes": 0,
+                "retweets": 0,
+                "likedByUser": false,
+                "replies": []
+            };
+
+            parentTweet.replies.push(newReply);
+
+            return {
+                reply: newReply
+            };
+        });
+
+        this.get("/tweets/:tweetId", (schema, request) => {
             const { tweetId } = request.params;
             const token = request.requestHeaders['Authorization'];
 
+            const tweet = findTweetByIdRecursive(tweets, tweetId);
+
+            if (!tweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
+            }
+
+            if (token) {
+                const decoded = decodeToken(token);
+                const userId = decoded?.sub;
+                return {
+                    ...tweet,
+                    likedByUser: userId && tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
+                };
+            }
+
+            return tweet;
+        });
+
+        this.delete("/tweets/:tweetId", (schema, request) => {
+            const { tweetId } = request.params;
+            const token = request.requestHeaders['Authorization'];
+
+            if (!token) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
+
             const decoded = decodeToken(token);
-            const { sub: userId } = decoded;
 
-            const tweet = tweets.find(tweet => tweet.id === tweetId);
+            const removed = removeTweetByIdRecursive(tweets, tweetId);
 
-            if (!tweetsLikedByUser[userId]) {
-
-                return new Response(200);
+            if (!removed) {
+                return new Response(404, {}, { error: "Tweet not found" });
             }
 
-            tweetsLikedByUser[userId] = tweetsLikedByUser[userId].filter(id => id !== tweetId);
+            // Remove from likes tracking
+            Object.keys(tweetsLikedByUser).forEach(user => {
+                if (tweetsLikedByUser[user]) {
+                    tweetsLikedByUser[user] = tweetsLikedByUser[user].filter(id => id !== tweetId);
+                }
+            });
 
-            tweet.likes--;
-
-            return {
-                count: tweet.likes,
-                likedByUser: false
-            }
+            return new Response(204);
         });
 
         this.get("/users/me", (schema, request) => {

@@ -19,7 +19,10 @@ const Timeline = memo(function Timeline({ posts, isLoading, isSuccess }) {
     );
   }
 
-  const postItems = posts.map((post) => <Post key={post.id} post={post} />);
+  const safePosts = posts || [];
+  const postItems = safePosts.map((post) => (
+    <Post key={post.id} post={post} showReplyLabel={post.isReply || false} />
+  ));
 
   return (
     <div className="flex flex-col gap-6 w-full animate-in fade-in duration-300">

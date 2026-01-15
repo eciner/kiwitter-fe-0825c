@@ -43,7 +43,11 @@ export default function Signup() {
               <label htmlFor="name" className="font-body font-medium">
                 İsim Soyisim
               </label>
-              <span className="text-sm font-medium text-red-600 font-body">
+              <span
+                id="signup-name-error"
+                className="text-sm font-medium text-red-600 font-body"
+                role="alert"
+              >
                 {errors.name && errors.name.message.toString()}
               </span>
             </div>
@@ -51,6 +55,8 @@ export default function Signup() {
               type="text"
               id="name"
               className="w-full h-11 px-4 border-2 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none font-body transition-all duration-200 hover:border-gray-400"
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "signup-name-error" : undefined}
               {...register("name", { required: "Bu alan zorunlu" })}
             />
           </div>
@@ -60,7 +66,11 @@ export default function Signup() {
               <label htmlFor="nickname" className="font-body font-medium">
                 Kullanıcı adı
               </label>
-              <span className="text-sm font-medium text-red-600 font-body">
+              <span
+                id="signup-nickname-error"
+                className="text-sm font-medium text-red-600 font-body"
+                role="alert"
+              >
                 {errors.nickname && errors.nickname.message.toString()}
               </span>
             </div>
@@ -68,6 +78,10 @@ export default function Signup() {
               type="text"
               id="nickname"
               className="w-full h-11 px-4 border-2 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none font-body transition-all duration-200 hover:border-gray-400"
+              aria-invalid={Boolean(errors.nickname)}
+              aria-describedby={
+                errors.nickname ? "signup-nickname-error" : undefined
+              }
               {...register("nickname", { required: "Bu alan zorunlu" })}
             />
           </div>
@@ -77,7 +91,11 @@ export default function Signup() {
               <label htmlFor="email" className="font-body font-medium">
                 Email
               </label>
-              <span className="text-sm font-medium text-red-600 font-body">
+              <span
+                id="signup-email-error"
+                className="text-sm font-medium text-red-600 font-body"
+                role="alert"
+              >
                 {errors.email && errors.email.message.toString()}
               </span>
             </div>
@@ -85,6 +103,8 @@ export default function Signup() {
               type="email"
               id="email"
               className="w-full h-11 px-4 border-2 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none font-body transition-all duration-200 hover:border-gray-400"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "signup-email-error" : undefined}
               {...register("email", {
                 required: "Bu alan zorunlu",
                 pattern: {
@@ -100,7 +120,11 @@ export default function Signup() {
               <label htmlFor="password" className="font-body font-medium">
                 Şifre
               </label>
-              <span className="text-sm font-medium text-red-600 font-body">
+              <span
+                id="signup-password-error"
+                className="text-sm font-medium text-red-600 font-body"
+                role="alert"
+              >
                 {errors.password && errors.password.message.toString()}
               </span>
             </div>
@@ -108,6 +132,10 @@ export default function Signup() {
               type="password"
               id="password"
               className="w-full h-11 px-4 border-2 rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none font-body transition-all duration-200 hover:border-gray-400"
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={
+                errors.password ? "signup-password-error" : undefined
+              }
               {...register("password", { required: "Bu alan zorunlu" })}
             />
           </div>

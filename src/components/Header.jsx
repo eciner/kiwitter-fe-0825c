@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, logout } from "../redux/userSlice.js";
 import { useState } from "react";
@@ -10,9 +10,11 @@ export default function Header() {
   const user = useSelector(selectUser);
   const isLoggedIn = !!user;
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const history = useHistory();
 
   const handleLogout = () => {
     dispatch(logout());
+    history.push("/login");
   };
 
   let links;
@@ -22,31 +24,37 @@ export default function Header() {
       <>
         <Link
           to={`/${user.nickname}`}
-          className="hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2"
+          className="flex items-center gap-2 hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2"
         >
+          <img
+            src={`https://i.pravatar.cc/150?u=${user.id}`}
+            alt={user.name}
+            className="w-8 h-8 rounded-full border-2 border-white/20"
+          />
           Profilim
         </Link>
-        <a
-          href="#"
+        <button
+          type="button"
           onClick={handleLogout}
-          className="hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2"
+          className="hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded"
         >
           Çıkış Yap
-        </a>
+        </button>
       </>
     );
   } else {
     links = (
       <>
         <button
+          type="button"
           onClick={() => setIsLoginModalOpen(true)}
-          className="hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2 bg-none border-none cursor-pointer text-white font-body text-sm font-bold"
+          className="hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2 bg-none border-none cursor-pointer text-white font-body text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded"
         >
           Giriş Yap
         </button>
         <Link
           to="/signup"
-          className="px-4 py-2 bg-accent rounded-lg hover:bg-accent/80 transition-all duration-200 hover:shadow-lg"
+          className="px-4 py-2 bg-accent rounded-lg hover:bg-accent/80 transition-all duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
         >
           Kayıt Ol
         </Link>
@@ -56,7 +64,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-white flex flex-row justify-between items-center">
+      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
         <Link
           to="/"
           className="hover:opacity-80 transition-opacity duration-200 flex items-center gap-2"
@@ -66,7 +74,7 @@ export default function Header() {
             kiwitter
           </h1>
         </Link>
-        <nav className="font-body font-bold text-sm flex flex-row flex-wrap gap-3 sm:gap-4 items-center justify-end text-right">
+        <nav className="font-body font-bold text-xs sm:text-sm flex flex-row flex-wrap gap-3 sm:gap-4 items-center justify-start sm:justify-end text-left sm:text-right w-full sm:w-auto">
           {links}
         </nav>
       </header>

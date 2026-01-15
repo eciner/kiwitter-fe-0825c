@@ -53,19 +53,24 @@ const PostEditor = memo(function PostEditor({
     <div
       className={`flex flex-col container mx-auto w-full max-w-3xl ${
         isReply
-          ? "bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+          ? "bg-gradient-to-r from-blue-50/80 via-white to-blue-50/80 rounded-lg shadow-md border-2 border-primary/20 hover:border-primary/40 hover:shadow-lg"
           : "bg-white rounded-xl shadow-xl"
-      } p-4 sm:p-5 md:p-6 gap-4 ${className}`}
+      } p-4 sm:p-5 md:p-6 gap-4 transition-all duration-200 ${className}`}
     >
       <form onSubmit={handleSubmit}>
         <textarea
-          className="w-full h-28 border-2 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-body resize-none transition-all duration-200 hover:border-primary/20 bg-white"
+          className={`w-full border-2 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-body resize-none transition-all duration-200 ${
+            isReply
+              ? "h-20 bg-white hover:bg-blue-50/70 hover:border-primary/40 border-primary/15"
+              : "h-28 bg-white hover:border-primary/20 border-gray-300"
+          }`}
+          aria-label={isReply ? "Yanıt" : "Tweet"}
           placeholder={isReply ? "Yanıtını yaz..." : "Düşüncelerini yaz"}
           value={text}
           onChange={handleChange}
           disabled={isSubmitting}
         />
-        <div className="flex flex-row justify-between items-center mt-3">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mt-3">
           <span
             className={`text-xs font-body font-medium ${
               MAX_LENGTH - text.length < 20 ? "text-red-500" : "text-gray-500"
@@ -80,7 +85,7 @@ const PostEditor = memo(function PostEditor({
               disabled
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-primary hover:bg-accent hover:shadow-lg hover:scale-[1.05] active:scale-[0.95]"
-            } text-white px-5 py-2 rounded-lg font-bold text-sm font-body transition-all duration-200`}
+            } text-white px-5 py-2 rounded-lg font-bold text-sm font-body transition-all duration-200 w-full sm:w-auto`}
           >
             {isSubmitting ? "Gönderiliyor..." : isReply ? "Yanıtla" : "Gönder"}
           </button>
