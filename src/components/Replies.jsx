@@ -1,25 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
-import { replyToTweet } from "../redux/tweetsSlice.js";
+import { useSelector } from "react-redux";
 import { selectUser } from "../redux/userSlice.js";
-import { memo, useCallback } from "react";
+import { memo } from "react";
 import Post from "./Post.jsx";
-import PostEditor from "./PostEditor.jsx";
+import ReplyEditor from "./ReplyEditor.jsx";
 import PropTypes from "prop-types";
 import { isPostOwner } from "../utils/ownership.js";
 
-const Replies = memo(function Replies({ parentPost, replies, onReplyAdded }) {
-  const dispatch = useDispatch();
+const Replies = memo(function Replies({
+  parentPost,
+  replies,
+  onReplyAdded,
+  enableReplyOnReply = false,
+}) {
   const currentUser = useSelector(selectUser);
-
-  const addPost = useCallback(
-    (post) => {
-      dispatch(replyToTweet({ replyTo: parentPost.id, reply: post }));
-      if (onReplyAdded) {
-        onReplyAdded(post);
-      }
-    },
-    [dispatch, parentPost.id, onReplyAdded]
-  );
 
   return (
     <div className="flex flex-col container mx-auto bg-gradient-to-b from-primary/5 via-blue-50 to-white w-full max-w-3xl rounded-b-2xl shadow-2xl border-t-4 border-primary transition-all duration-300 overflow-hidden relative">
@@ -33,11 +26,10 @@ const Replies = memo(function Replies({ parentPost, replies, onReplyAdded }) {
             {replies?.length || 0}
           </span>
         </h3>
-        <PostEditor
-          addPost={addPost}
+        <ReplyEditor
+          parentPost={parentPost}
+          onReplyAdded={onReplyAdded}
           className="w-full !bg-white !shadow-lg hover:!shadow-xl !border-2 !border-primary/25 !rounded-xl"
-          isReply={true}
-          parentId={parentPost.id}
         />
       </div>
       <div className="flex flex-col gap-3 p-3 sm:p-4 md:p-5 bg-gradient-to-b from-white/30 via-white/50 to-white">
@@ -63,6 +55,7 @@ const Replies = memo(function Replies({ parentPost, replies, onReplyAdded }) {
                   post={reply}
                   isReply={true}
                   className="w-full !rounded-lg !bg-white !shadow-md hover:!shadow-lg hover:!bg-blue-50/40 !border-l-4 !border-primary/40 hover:!border-primary !transform hover:scale-100 transition-all duration-200"
+                  enableReplyOnReply={enableReplyOnReply}
                 />
               </div>
             ))
@@ -87,6 +80,7 @@ Replies.propTypes = {
   }).isRequired,
   replies: PropTypes.array,
   onReplyAdded: PropTypes.func,
+  enableReplyOnReply: PropTypes.bool,
 };
 
 export default Replies;

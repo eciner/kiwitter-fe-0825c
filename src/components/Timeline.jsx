@@ -21,7 +21,12 @@ const Timeline = memo(function Timeline({ posts, isLoading, isSuccess }) {
 
   const safePosts = posts || [];
   const postItems = safePosts.map((post) => (
-    <Post key={post.id} post={post} showReplyLabel={post.isReply || false} />
+    <Post
+      key={post.id}
+      post={post}
+      showReplyLabel={post.isReply || false}
+      enableReplyOnReply={true}
+    />
   ));
 
   return (
@@ -31,7 +36,7 @@ const Timeline = memo(function Timeline({ posts, isLoading, isSuccess }) {
           postItems
         ) : (
           <span className="text-white font-body text-center py-8 opacity-60">
-            Bu kullanıcının tweet'leri yok
+            Henüz paylaşım yok
           </span>
         )}
       </div>

@@ -27,7 +27,7 @@ export default function Header() {
           className="flex items-center gap-2 hover:text-gray-300 transition-colors duration-200 hover:underline underline-offset-2"
         >
           <img
-            src={`https://i.pravatar.cc/150?u=${user.id}`}
+            src={`https://i.pravatar.cc/150?u=${user.sub ?? user.id}`}
             alt={user.name}
             className="w-8 h-8 rounded-full border-2 border-white/20"
           />

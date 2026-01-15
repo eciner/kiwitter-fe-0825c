@@ -17,6 +17,9 @@ const Post = memo(function Post({
   className = "",
   isDetail = false,
   showReplyLabel = false,
+  repliesOverride = null,
+  onReplyAdded,
+  enableReplyOnReply = false,
 }) {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.user);
@@ -90,6 +93,10 @@ const Post = memo(function Post({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMenuOpen]);
+
+  const replies = repliesOverride ?? post.replies ?? [];
+  const canShowReplies =
+    isRepliesVisible && (!isReply || enableReplyOnReply);
 
   const iconClass = post.likedByUser
     ? "bi bi-suit-heart-fill cursor-pointer hover:text-accent text-primary"
@@ -217,7 +224,7 @@ const Post = memo(function Post({
                 aria-expanded={isRepliesVisible}
               ></button>
               <span className="group-hover:text-primary transition-colors duration-200">
-                {post.replies?.length || 0}
+                {replies.length}
               </span>
             </div>
             <div className="flex flex-row gap-2 items-center group">
@@ -250,8 +257,13 @@ const Post = memo(function Post({
           </div>
         </div>
       </div>
-      {!isReply && isRepliesVisible && post.replies && (
-        <Replies parentPost={post} replies={post.replies} />
+      {canShowReplies && (
+        <Replies
+          parentPost={post}
+          replies={replies}
+          onReplyAdded={onReplyAdded}
+          enableReplyOnReply={enableReplyOnReply}
+        />
       )}
     </div>
   );
@@ -274,6 +286,9 @@ Post.propTypes = {
   className: PropTypes.string,
   isDetail: PropTypes.bool,
   showReplyLabel: PropTypes.bool,
+  repliesOverride: PropTypes.array,
+  onReplyAdded: PropTypes.func,
+  enableReplyOnReply: PropTypes.bool,
 };
 
 export default Post;

@@ -2,10 +2,14 @@ import { createServer, Response } from "miragejs"
 import { jwtDecode } from "jwt-decode";
 
 function decodeToken(token) {
+    if (!token) {
+        return null;
+    }
+
     try {
         // Remove 'Bearer ' prefix if present
         const cleanToken = token.replace('Bearer ', '');
-        
+
         // Try to decode as JWT first
         try {
             return jwtDecode(cleanToken);
@@ -118,6 +122,19 @@ function removeTweetByIdRecursive(tweetsList, tweetId) {
     return removed;
 }
 
+function setLikedByUserRecursive(tweet, userId, tweetsLikedByUser) {
+    const tweetCopy = {
+        ...tweet,
+        likedByUser: tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
+    };
+
+    if (tweet.replies && tweet.replies.length > 0) {
+        tweetCopy.replies = tweet.replies.map(reply => setLikedByUserRecursive(reply, userId, tweetsLikedByUser));
+    }
+
+    return tweetCopy;
+}
+
 const tweetsLikedByUser = {
 
 }
@@ -216,13 +233,13 @@ createServer({
             if (token) {
 
                 const decoded = decodeToken(token);
+                if (!decoded) {
+                    return new Response(401, {}, { error: "Unauthorized" });
+                }
                 const { sub: userId } = decoded;
 
                 return {
-                    tweets: tweets.map(tweet => ({
-                        ...tweet,
-                        likedByUser: tweetsLikedByUser[userId] && tweetsLikedByUser[userId].includes(tweet.id) ? true : false
-                    }))
+                    tweets: tweets.map(tweet => setLikedByUserRecursive(tweet, userId, tweetsLikedByUser))
                 }
             } else {
 
@@ -238,6 +255,9 @@ createServer({
             const token = request.requestHeaders['Authorization'];
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
 
             const newTweet = {
                 "id": window.crypto.randomUUID(),
@@ -265,18 +285,31 @@ createServer({
             const token = request.requestHeaders['Authorization'];
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
             const { sub: userId } = decoded;
 
-            const tweet = tweets.find(tweet => tweet.id === tweetId);
+            const tweet = findTweetByIdRecursive(tweets, tweetId);
+
+            if (!tweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
+            }
 
             if (!tweetsLikedByUser[userId]) {
 
-                return new Response(200);
+                return {
+                    count: tweet.likes,
+                    likedByUser: false
+                };
             }
 
+            const wasLiked = tweetsLikedByUser[userId].includes(tweetId);
             tweetsLikedByUser[userId] = tweetsLikedByUser[userId].filter(id => id !== tweetId);
 
-            tweet.likes--;
+            if (wasLiked) {
+                tweet.likes = Math.max(0, tweet.likes - 1);
+            }
 
             return {
                 count: tweet.likes,
@@ -290,23 +323,29 @@ createServer({
             const token = request.requestHeaders['Authorization'];
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
             const { sub: userId } = decoded;
 
-            const tweet = tweets.find(tweet => tweet.id === tweetId);
+            const tweet = findTweetByIdRecursive(tweets, tweetId);
 
-            if (tweetsLikedByUser[userId]) {
-
-                tweetsLikedByUser[userId].push(tweetId);
-
-            } else {
-
-                tweetsLikedByUser[userId] = [tweetId];
+            if (!tweet) {
+                return new Response(404, {}, { error: "Tweet not found" });
             }
 
-            tweet.likes++;
+            if (!tweetsLikedByUser[userId]) {
+                tweetsLikedByUser[userId] = [];
+            }
+
+            if (!tweetsLikedByUser[userId].includes(tweetId)) {
+                tweetsLikedByUser[userId].push(tweetId);
+                tweet.likes++;
+            }
 
             return {
-                count: tweet.likes
+                count: tweet.likes,
+                likedByUser: true
             }
         });
 
@@ -316,6 +355,9 @@ createServer({
             const { content } = JSON.parse(request.requestBody);
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
             const { sub: authorId, name, nickname: username } = decoded;
 
             const parentTweet = findTweetByIdRecursive(tweets, tweetId);
@@ -356,6 +398,9 @@ createServer({
 
             if (token) {
                 const decoded = decodeToken(token);
+                if (!decoded) {
+                    return new Response(401, {}, { error: "Unauthorized" });
+                }
                 const userId = decoded?.sub;
                 return {
                     ...tweet,
@@ -375,6 +420,9 @@ createServer({
             }
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
 
             const removed = removeTweetByIdRecursive(tweets, tweetId);
 
@@ -397,6 +445,9 @@ createServer({
             const token = request.requestHeaders['Authorization'];
 
             const decoded = decodeToken(token);
+            if (!decoded) {
+                return new Response(401, {}, { error: "Unauthorized" });
+            }
             const { sub: id, name, nickname: username } = decoded;
 
             return {

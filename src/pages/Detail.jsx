@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 
 import PageLayout from "../layouts/PageLayout.jsx";
 import Post from "../components/Post.jsx";
-import Replies from "../components/Replies.jsx";
 
 import axios from "../utils/axios.js";
 import { selectUser } from "../redux/userSlice.js";
@@ -153,13 +152,20 @@ export default function Detail() {
               ? "Yanıtın"
               : "Yanıt"}
           </div>
-          <Post post={currentTweet} isDetail={true} className="!shadow-xl" />
+          <Post
+            post={currentTweet}
+            isDetail={true}
+            className="!shadow-xl"
+            repliesOverride={repliesForCurrentTweet || []}
+            onReplyAdded={handleReplyAdded}
+            enableReplyOnReply={true}
+          />
         </div>
 
         {/* Other sibling replies sorted newest to latest */}
         {siblingReplies && siblingReplies.length > 1 && (
           <div className="w-full flex flex-col gap-3">
-            <h3 className="text-sm font-heading font-bold text-gray-600 uppercase tracking-wide px-2">
+            <h3 className="text-sm font-heading font-bold text-white uppercase tracking-wide px-2 drop-shadow-sm">
               Diğer Yanıtlar
             </h3>
             {siblingReplies
@@ -174,20 +180,13 @@ export default function Detail() {
                     post={reply}
                     isReply={true}
                     className="w-full !rounded-lg !bg-white !shadow-md hover:!shadow-lg !border-l-4 !border-primary/40 hover:!border-primary"
+                    enableReplyOnReply={true}
                   />
                 </div>
               ))}
           </div>
         )}
 
-        {/* Replies to the current tweet */}
-        {currentTweet && (
-          <Replies
-            parentPost={currentTweet}
-            replies={repliesForCurrentTweet || []}
-            onReplyAdded={handleReplyAdded}
-          />
-        )}
       </div>
     </PageLayout>
   );

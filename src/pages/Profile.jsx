@@ -19,6 +19,7 @@ import axios from "../utils/axios.js";
 export default function Profile() {
   const { username } = useParams();
   const [userInfo, setUserInfo] = useState(null);
+  const [userError, setUserError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("tweets");
@@ -29,13 +30,19 @@ export default function Profile() {
 
   // Fetch user info
   useEffect(() => {
+    setUserError(null);
     axios
       .get(`/users/${isCurrentUser ? "me" : username}`)
       .then((response) => {
         setUserInfo(response.data);
       })
       .catch((error) => {
-        // Handle user info fetch errors silently
+        const message =
+          error.response?.status === 404
+            ? "Kullanıcı bulunamadı"
+            : "Kullanıcı bilgileri yüklenemedi";
+        setUserError(message);
+        setUserInfo(null);
       });
   }, [username, isCurrentUser]);
 
@@ -74,6 +81,16 @@ export default function Profile() {
   const handleAddPost = (post) => {
     dispatch(addTweet(post));
   };
+
+  if (userError) {
+    return (
+      <PageLayout>
+        <div className="text-center text-2xl font-heading font-bold text-white">
+          {userError}
+        </div>
+      </PageLayout>
+    );
+  }
 
   if (!userInfo) {
     return (

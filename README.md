@@ -10,6 +10,7 @@ A fully functional Twitter clone built with React, Redux Toolkit, and Tailwind C
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [API Endpoints (Mock)](#api-endpoints-mock)
+- [Architecture Highlights](#architecture-highlights)
 - [Available Scripts](#available-scripts)
 - [Development Notes](#development-notes)
 - [Troubleshooting](#troubleshooting)
@@ -27,41 +28,47 @@ Kiwitter is a fully functional Twitter clone featuring real-time interactions, n
   - Token persistence via localStorage
   - Modal-based login for seamless UX
   - Protected routes with authorization checks
+  - Automatic session restoration on page reload
 
 - **📝 Tweet Management**
 
   - Create tweets (160 character limit)
   - Delete tweets (owner-only)
-  - View tweet details and threads
-  - Real-time character counter
+  - View tweet details and nested threads
+  - Real-time character counter with visual feedback
+  - Delete functionality with ownership verification
 
 - **💬 Social Interactions**
 
-  - Like/unlike tweets with optimistic updates
+  - Like/unlike tweets with optimistic UI updates
+  - Full like functionality for nested content (replies and reply-to-reply tweets)
   - Nested reply system (threaded conversations)
-  - Reply detail pages with parent tweet context
-  - Newest-first reply sorting
+  - Reply to tweets and replies directly from timelines
+  - Detailed conversation views with parent tweet context
+  - Newest-first reply sorting for chronological readability
+  - Recursive like tracking across all conversation depths
 
 - **👤 User Profiles**
 
   - View user-specific tweets, replies, and liked tweets
-  - Tab-based navigation (Tweets / Likes / Replies)
-  - Profile creation and tweet composer integration
-  - Ownership-based action gating
+  - Tab-based navigation (Tweets / Replies / Likes)
+  - Profile information display
+  - Ownership-based action visibility (delete buttons for own posts only)
+  - Comprehensive likes display including nested tweet likes
 
 - **📊 Multiple Timeline Modes**
 
-  - Timeline: Chronological feed of all tweets
-  - Tweets: User's own tweets only
-  - Replies: User's reply history
-  - Most Liked: Popular tweets from last 24h (sorted by likes)
+  - **Timeline**: Chronological feed of all tweets
+  - **Tweets**: User's own tweets only
+  - **Replies**: User's reply history
+  - **Most Liked**: Popular tweets from last 24 hours (sorted by likes)
 
 - **🎨 UI/UX Excellence**
   - Responsive mobile-first design
-  - Smooth animations and transitions
-  - Toast notifications for user feedback
+  - Smooth fade-in animations and transitions
+  - Toast notifications for user feedback (success and error messages)
   - Error boundaries for graceful error handling
-  - Loading states and skeleton screens
+  - Loading states during async operations
   - Custom brand identity (raven logo, KiWi Indigo theme)
 
 ## 🛠️ Tech Stack
@@ -129,47 +136,55 @@ The app uses MirageJS for a complete mock backend - no server setup required!
 
 ```
 kiwitter-fe/
+├── dist/                         # Production build output
+├── node_modules/                 # Installed dependencies
+├── public/                       # Static assets
 ├── src/
 │   ├── components/               # Reusable UI components
-│   │   ├── ErrorBoundary.jsx    # Error handling wrapper
-│   │   ├── Header.jsx           # Navigation & user info
-│   │   ├── LoginModal.jsx       # Modal login form
-│   │   ├── Post.jsx             # Tweet display card
-│   │   ├── PostEditor.jsx       # Tweet/reply composer
-│   │   ├── Replies.jsx          # Reply list container
-│   │   ├── ReplyEditor.jsx      # Reply form component
-│   │   ├── Timeline.jsx         # Tweet feed display
-│   │   └── TimelineSelector.jsx # Mode switcher tabs
+│   │   ├── ErrorBoundary.jsx     # Error handling wrapper
+│   │   ├── Header.jsx            # Navigation & user info
+│   │   ├── LoginModal.jsx        # Modal login form
+│   │   ├── Post.jsx              # Tweet display card
+│   │   ├── PostEditor.jsx        # Tweet/reply composer
+│   │   ├── Replies.jsx           # Reply list container
+│   │   ├── ReplyEditor.jsx       # Reply form component
+│   │   ├── Timeline.jsx          # Tweet feed display
+│   │   └── TimelineSelector.jsx  # Mode switcher tabs
+│   ├── hooks/                    # Custom React hooks
+│   │   └── useLogin.js           # Login-related hook helpers
 │   ├── layouts/                  # Layout wrappers
-│   │   ├── AuthLayout.jsx       # Auth pages wrapper
-│   │   └── PageLayout.jsx       # Main app layout
+│   │   ├── AuthLayout.jsx        # Auth pages wrapper
+│   │   └── PageLayout.jsx        # Main app layout
 │   ├── pages/                    # Route-level pages
-│   │   ├── Detail.jsx           # Tweet detail/thread view
-│   │   ├── Home.jsx             # Home timeline
-│   │   ├── Login.jsx            # Login page
-│   │   ├── Profile.jsx          # User profile view
-│   │   └── Signup.jsx           # Registration page
+│   │   ├── Detail.jsx            # Tweet detail/thread view
+│   │   ├── Home.jsx              # Home timeline
+│   │   ├── Login.jsx             # Login page
+│   │   ├── Profile.jsx           # User profile view
+│   │   └── Signup.jsx            # Registration page
 │   ├── redux/                    # Redux Toolkit state
-│   │   ├── store.js             # Store configuration
-│   │   ├── tweetsSlice.js       # Tweets state & selectors
-│   │   ├── twitsSlice.js        # Compatibility re-export
-│   │   └── userSlice.js         # Auth state & user info
+│   │   ├── store.js              # Store configuration
+│   │   ├── tweetsSlice.js        # Tweets state & selectors
+│   │   └── userSlice.js          # Auth state & user info
 │   ├── utils/                    # Helper functions
-│   │   ├── auth.js              # LocalStorage token helpers
-│   │   ├── axios.js             # HTTP client config
-│   │   ├── devserver.js         # MirageJS mock server
-│   │   └── ownership.js         # Authorization checks
+│   │   ├── auth.js               # LocalStorage token helpers
+│   │   ├── axios.js              # HTTP client config
+│   │   ├── devserver.js          # MirageJS mock server
+│   │   └── ownership.js          # Authorization checks
 │   ├── icon/                     # SVG logo assets
 │   ├── App.jsx                   # Root component
 │   ├── main.jsx                  # Entry point
 │   ├── App.css                   # Component styles
 │   └── index.css                 # Global styles + animations
-├── public/                       # Static assets
+├── .gitignore                    # Git ignore rules
+├── eslint.config.js              # ESLint rules
+├── index.html                    # Vite HTML entry
 ├── package.json                  # Dependencies & scripts
-├── vite.config.js               # Vite configuration
-├── tailwind.config.js           # Tailwind theme & colors
-├── postcss.config.js            # PostCSS plugins
-└── eslint.config.js             # ESLint rules
+├── package-lock.json             # npm lockfile
+├── postcss.config.js             # PostCSS plugins
+├── README.md                     # Project documentation
+├── sessions.md                   # Development sessions log
+├── tailwind.config.js            # Tailwind theme & colors
+└── vite.config.js                # Vite configuration
 ```
 
 ## 🌐 API Endpoints (Mock)
@@ -185,15 +200,15 @@ All endpoints are provided by MirageJS mock server configured in `src/utils/devs
 
 ### Tweets
 
-| Method | Endpoint              | Description                | Auth Required |
-| ------ | --------------------- | -------------------------- | ------------- |
-| GET    | `/tweets`             | Get all tweets             | Optional      |
-| POST   | `/tweets`             | Create new tweet           | ✅            |
-| GET    | `/tweets/:id`         | Get tweet detail/thread    | Optional      |
-| DELETE | `/tweets/:id`         | Delete tweet (owner/admin) | ✅            |
-| POST   | `/tweets/:id/like`    | Like tweet                 | ✅            |
-| DELETE | `/tweets/:id/like`    | Unlike tweet               | ✅            |
-| POST   | `/tweets/:id/replies` | Reply to tweet             | ✅            |
+| Method | Endpoint              | Description               | Auth Required |
+| ------ | --------------------- | ------------------------- | ------------- |
+| GET    | `/tweets`             | Get all tweets            | Optional      |
+| POST   | `/tweets`             | Create new tweet          | ✅            |
+| GET    | `/tweets/:id`         | Get tweet detail/thread   | Optional      |
+| DELETE | `/tweets/:id`         | Delete tweet (owner only) | ✅            |
+| POST   | `/tweets/:id/like`    | Like tweet                | ✅            |
+| DELETE | `/tweets/:id/like`    | Unlike tweet              | ✅            |
+| POST   | `/tweets/:id/replies` | Reply to tweet            | ✅            |
 
 ### Users
 
@@ -204,47 +219,50 @@ All endpoints are provided by MirageJS mock server configured in `src/utils/devs
 
 **Note**: When authenticated, the `Authorization` header should contain the JWT token in `Bearer <token>` format.
 
-## ⚡ Features
+## 🏗️ Architecture Highlights
 
-### Architecture Highlights
+### Redux Toolkit State Management
 
-- **Redux Toolkit State Management**
+- **Centralized State**: Tweets and authentication stored in single Redux store
+- **Optimistic Updates**: UI updates immediately, then syncs with API
+- **Selector Patterns**: Filtered views for timeline modes (All, Likes, Replies, etc.)
+- **Nested Reply Handling**: Recursive helpers support arbitrary conversation depth
 
-  - Centralized state for tweets and authentication
-  - Optimistic UI updates for better UX
-  - Selector patterns for filtered views (timeline modes)
-  - Nested reply handling with recursive helpers
+### Component-Driven Design
 
-- **Component-Driven Design**
+- **Reusable Components**: PropTypes validation across all components
+- **Separation of Concerns**: Clear distinction between pages, layouts, and components
+- **Conditional Styling**: Reply and main tweet display with appropriate visual hierarchy
+- **Error Boundaries**: Graceful error handling prevents white-screen failures
 
-  - Reusable, composable components with PropTypes validation
-  - Separation of concerns (pages/layouts/components)
-  - Conditional styling patterns for replies vs main tweets
-  - Error boundaries for graceful degradation
+### Authentication Flow
 
-- **Authentication Flow**
+- **Token Management**: JWT-like token generation and base64 decoding
+- **LocalStorage Persistence**: Tokens persist across browser sessions
+- **Axios Interceptors**: Automatic token injection in request headers
+- **Session Restoration**: Automatic login on page reload if valid token exists
+- **401 Handling**: Automatic logout on authentication failures
 
-  - JWT-like token generation and decoding
-  - LocalStorage persistence with axios interceptors
-  - Automatic session restoration on page reload
-  - 401 response handling with automatic logout
+### Mock API Integration
 
-- **Mock API Integration**
-  - 100 pre-generated tweets with nested replies
-  - Recursive tweet/reply lookup functions
-  - User-specific like tracking
-  - Token-based authorization simulation
+- **100 Pre-generated Tweets**: Realistic sample data for testing
+- **Nested Replies**: Each tweet includes up to 3 replies for testing threads
+- **Recursive Lookup**: Tweet/reply functions support nested structure traversal
+- **User-Specific Tracking**: Like status stored per user across all nesting levels
+- **Token-Based Authorization**: Simulates real authentication for protected endpoints
+- **Recursive Like Handling**: `setLikedByUserRecursive()` ensures `likedByUser` flag accuracy at all depths
+- **Idempotent Like Operations**: Like/unlike endpoints return consistent `{ count, likedByUser }` format
 
 ### UI/UX Features
 
-- **Responsive Design**: Mobile-first design using Tailwind CSS with custom KiWi Indigo theme
-- **Smooth Animations**: Fade-in animations for replies with staggered 50ms delays between items
-- **Toast Notifications**: User feedback for all actions (success and error messages)
-- **Loading States**: Loading indicators and graceful empty states throughout the interface
-- **Character Counter**: Real-time tweet length validation with visual feedback at 160 character limit
-- **Relative Timestamps**: Human-readable dates and times using Day.js
-- **Modal Login**: In-context authentication without navigating away from current page
-- **Brand Identity**: Custom raven logo with light and dark variants for theme support
+- **Responsive Design**: Mobile-first approach using Tailwind CSS
+- **Custom Theme**: KiWi Indigo color scheme with custom typography
+- **Animations**: Fade-in effects with staggered 50ms delays for lists
+- **Toast Feedback**: Non-intrusive notifications for all user actions
+- **Relative Timestamps**: Human-readable dates using Day.js (e.g., "2 hours ago")
+- **Loading States**: Visual indicators during async operations
+- **Character Counter**: Real-time validation with color feedback (red at 160 chars)
+- **Brand Identity**: Custom raven logo with light/dark variants
 
 ## 📜 Available Scripts
 
@@ -267,9 +285,13 @@ npm run lint     # Run ESLint checks
 - **Token Format**: JWT-like structure with base64-encoded header/payload/signature
 - **Reply Sorting**: Newest-first display using `[...replies].sort((a, b) => b.createDate - a.createDate)`
 - **Recursive Operations**: Tweet/reply lookup and deletion support nested structures
+- **Recursive Like Tracking**: `setLikedByUserRecursive()` traverses entire tweet tree to set `likedByUser` flags
 - **Timeline Modes**: Implemented via Redux selectors with filtering logic
 - **Ownership Checks**: `isPostOwner()` utility compares decoded token `sub` with `authorId`
 - **Axios Interceptor**: Automatically clears auth state on 401 responses
+- **Mock Auth Hardening**: Auth-required routes return 401 for missing/invalid tokens
+- **Like/Unlike Consistency**: Like endpoints use `findTweetByIdRecursive()` to handle nested tweets
+- **Package Manager**: Use npm with `package-lock.json` (yarn is not supported)
 
 ### Custom Tailwind Theme
 
